@@ -1,0 +1,1 @@
+{"dependencies":[["ffi",[">= 1.0.0"]],["win32-process",[">= 0"]],["vagrant-sshfs",["= 1.3.7"]]],"checksum":"abfbf3a0dbe21f31488bd0f3cdd8d77c94085899620efc9d0e7a244ac94e55ed","vagrant_version":"2.4.1"}

@@ -1,0 +1,15 @@
+1. --annotate overwrites metadata.
+Use implicit counter PR and run with trace_exec, the loginuid field will fail on v0.34.0
+
+2. operator.oci.annotate doesn't work from a gadget instance spec file
+
+3. There is not way enable metrics collection on ig-k8s
+
+4. kubectl-gadget run trace_exec:latest -A --filter=proc.comm doesn't work
+-- filter with a bad filter remains stuck without providing any feedback
+
+5. Attach says "instance not found" when there are multiple with the same name
+
+6. Attach right after run crashes
+
+7. Missing kubectl exec on https://www.inspektor-gadget.io/docs/v0.34.0/gadgets/profile_tcprtt to add delay
