@@ -122,3 +122,18 @@ spec:
         - name: config
           configMap:
             name: prometheus-server-conf
+
+# TODO: create a service for prometheus
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: monitoring
+spec:
+  selector:
+    app: prometheus
+  ports:
+  - port: 9090
+    targetPort: 9090
+  type: ClusterIP
