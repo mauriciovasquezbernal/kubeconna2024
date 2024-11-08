@@ -1,0 +1,10 @@
+- show how to install IG
+ - --otel-listen --otel-metrics-listen (TODO)
+- show how to deploy prometheus
+  - scrape config
+  - show alert configuration
+- run gadget with alerts
+  - show configuration of the gadget
+- show metric in prometheus
+- generate events and see how the metric is updated
+- show the alert being fired
