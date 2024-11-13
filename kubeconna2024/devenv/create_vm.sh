@@ -67,18 +67,13 @@ az vm create \
   --admin-password $ADMIN_PASSWORD \
   --nics $NIC_NAME
 
-az vm run-command invoke \
-    --resource-group $RESOURCE_GROUP \
-    --name $VM_NAME  \
-    --command-id RunShellScript \
-    --scripts @provision.sh
-
-# Step 7: (Optional) Open port 22 for SSH
-az vm open-port --resource-group $RESOURCE_GROUP --name $VM_NAME --port 22
-az vm open-port --resource-group $RESOURCE_GROUP --name $VM_NAME --port 3000
-az vm open-port --resource-group $RESOURCE_GROUP --name $VM_NAME --port 9000
+# Step 7: (Optional) Open ports for ssh, prometheus, and grafana.
+az vm open-port --resource-group $RESOURCE_GROUP --name $VM_NAME --port 22,3000,9090
 
 echo "VM $VM_NAME has been created successfully!"
 
-IP_ADDRESS=$(az network public-ip show -g $RESOURCE_GROUP --name $PUBLIC_IP_NAME | jq '.ipAddress')
+IP_ADDRESS=$(az network public-ip show -g $RESOURCE_GROUP --name $PUBLIC_IP_NAME | jq -r  '.ipAddress')
 echo "IP address is $IP_ADDRESS"
+
+sshpass -p $ADMIN_PASSWORD ssh -o StrictHostKeyChecking=no $ADMIN_USERNAME@$IP_ADDRESS 'bash -s' < provision.sh
+sshpass -p $ADMIN_PASSWORD ssh -o StrictHostKeyChecking=no $ADMIN_USERNAME@$IP_ADDRESS 'bash -s' < port_forward.sh & > /dev/null 2>&1

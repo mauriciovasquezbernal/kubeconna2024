@@ -7,22 +7,18 @@ IG_ARCH=amd64
 
 # copy help files
 cd /home/iguser
+rm -rf kubecon-na-2024
 git clone https://github.com/inspektor-gadget/kubecon-na-2024.git
 
 # update and install all dependencies
 sudo apt-get update && sudo apt-get install docker docker-compose -y
+sudo usermod -aG docker iguser && newgrp docker
 
 # prepull builder image
 sudo docker pull ghcr.io/inspektor-gadget/ebpf-builder:${IG_VERSION}
 
 # install ig binary
 curl -sL https://github.com/inspektor-gadget/inspektor-gadget/releases/download/${IG_VERSION}/ig-linux-${IG_ARCH}-${IG_VERSION}.tar.gz | sudo tar -C /usr/local/bin -xzf - ig
-
-# install kubectl
-curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-
-# install kubectl-gadget
-curl -sL https://github.com/inspektor-gadget/inspektor-gadget/releases/download/${IG_VERSION}/kubect-gadget-${IG_ARCH}-${IG_VERSION}.tar.gz | sudo tar -C /usr/local/bin -xzf - ig
 
 # install minikube
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
@@ -31,11 +27,22 @@ sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-a
 # create minikube cluster
 minikube start --driver=docker
 
-# inspektor-gadget
-kubectl-gadget deploy --image=ghcr.io/inspektor-gadget/inspektor-gadget:latest --otel-metrics-listen --otel-metrics-listen-port=2223
+# install kubectl
+curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+
+sudo apt-get install make -y
+sudo snap install go --classic
+git clone https://github.com/inspektor-gadget/inspektor-gadget.git
+cd inspektor-gadget
+git checkout mauricio/kubecon-fixes
+make kubectl-gadget
+sudo install kubectl-gadget /usr/local/bin/kubectl-gadget
+kubectl-gadget deploy --verify-image=false --image=ghcr.io/inspektor-gadget/inspektor-gadget:latest --otel-metrics-listen --otel-metrics-listen-address=0.0.0.0:2223
 
 # prometheus
-kubectl apply -f https://raw.githubusercontent.com/mauriciovasquezbernal/kubeconna2024/refs/heads/main/rejektsna2024/prometheus/prometheus.yaml?token=GHSAT0AAAAAACYW33XHRVXZ4AIXWAMMF6CYZZS4FFQ
+kubectl apply -f https://raw.githubusercontent.com/mauriciovasquezbernal/kubeconna2024/refs/heads/main/rejektsna2024/prometheus/prometheus.yaml
 kubectl -n monitoring wait --for=condition=ready pod -l app=prometheus --timeout=300s
 
 # helm
@@ -50,9 +57,4 @@ sudo apt-get install helm
 helm repo add grafana https://grafana.github.io/helm-charts
 helm install grafana grafana/grafana --set adminPassword=abcd --namespace monitoring
 kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64
-
-#kubectl port-forward --namespace monitoring deployment/prometheus 9090:9090 &
-
-
-#export POD_NAME=$(kubectl get pods --namespace monitoring -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=grafana" -o jsonpath="{.items[0].metadata.name}")
-#kubectl --namespace monitoring port-forward $POD_NAME 3000 &
+kubectl -n monitoring wait --for=condition=ready pod -l app.kubernetes.io/instance=grafana --timeout=300s
