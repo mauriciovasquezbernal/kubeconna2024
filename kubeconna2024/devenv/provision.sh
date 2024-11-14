@@ -18,7 +18,9 @@ sudo usermod -aG docker iguser && newgrp docker
 sudo docker pull ghcr.io/inspektor-gadget/ebpf-builder:${IG_VERSION}
 
 # install ig binary
-curl -sL https://github.com/inspektor-gadget/inspektor-gadget/releases/download/${IG_VERSION}/ig-linux-${IG_ARCH}-${IG_VERSION}.tar.gz | sudo tar -C /usr/local/bin -xzf - ig
+curl -LO https://github.com/inspektor-gadget/inspektor-gadget/releases/download/v0.34.0/ig-linux-amd64-v0.34.0.tar.gz 
+tar xfvz ig-linux-amd64-v0.34.0.tar.gz
+sudo install ig /usr/local/bin/ig && rm ig-linux-amd64-v0.34.0.tar.gz ig
 
 # install minikube
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
