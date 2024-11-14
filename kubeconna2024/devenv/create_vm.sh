@@ -9,7 +9,8 @@ VM_NAME="contributest-vm"
 VM_SIZE="Standard_D4ads_v5"
 IMAGE="Ubuntu2204"
 ADMIN_USERNAME="iguser"
-ADMIN_PASSWORD="InspektorGadget642!"
+#ADMIN_PASSWORD="InspektorGadget642!"
+ADMIN_PASSWORD=$(tr </dev/urandom -dc 'A-Za-z0-9!@#$%&*_-' | head -c12 || true) # Generate a random password
 VNET_NAME="MyVNet"
 SUBNET_NAME="MySubnet"
 NIC_NAME="MyNIC"
@@ -67,13 +68,14 @@ az vm create \
   --admin-password $ADMIN_PASSWORD \
   --nics $NIC_NAME
 
-# Step 7: (Optional) Open ports for ssh, prometheus, and grafana.
 az vm open-port --resource-group $RESOURCE_GROUP --name $VM_NAME --port 22,3000,9090
 
-echo "VM $VM_NAME has been created successfully!"
+#echo "VM $VM_NAME has been created successfully!"
 
 IP_ADDRESS=$(az network public-ip show -g $RESOURCE_GROUP --name $PUBLIC_IP_NAME | jq -r  '.ipAddress')
-echo "IP address is $IP_ADDRESS"
+#echo "IP address is $IP_ADDRESS"
 
 sshpass -p $ADMIN_PASSWORD ssh -o StrictHostKeyChecking=no $ADMIN_USERNAME@$IP_ADDRESS 'bash -s' < provision.sh
 sshpass -p $ADMIN_PASSWORD ssh -o StrictHostKeyChecking=no $ADMIN_USERNAME@$IP_ADDRESS 'bash -s' < port_forward.sh & > /dev/null 2>&1
+
+echo "ssh $ADMIN_USERNAME@$IP_ADDRESS # password $ADMIN_PASSWORD" >> ssh.txt

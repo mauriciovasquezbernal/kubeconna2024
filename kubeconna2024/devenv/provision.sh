@@ -39,7 +39,7 @@ cd inspektor-gadget
 git checkout mauricio/kubecon-fixes
 make kubectl-gadget
 sudo install kubectl-gadget /usr/local/bin/kubectl-gadget
-kubectl-gadget deploy --verify-image=false --image=ghcr.io/inspektor-gadget/inspektor-gadget:latest --otel-metrics-listen --otel-metrics-listen-address=0.0.0.0:2223
+kubectl-gadget deploy --verify-gadgets=false --image=ghcr.io/inspektor-gadget/inspektor-gadget:latest --otel-metrics-listen --otel-metrics-listen-address=0.0.0.0:2223
 
 # prometheus
 kubectl apply -f https://raw.githubusercontent.com/mauriciovasquezbernal/kubeconna2024/refs/heads/main/rejektsna2024/prometheus/prometheus.yaml

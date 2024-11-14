@@ -4,7 +4,7 @@ set -xe
 minikube start --driver=docker
 
 # inspektor-gadget
-kubectl-gadget deploy --image=ghcr.io/inspektor-gadget/inspektor-gadget:latest --otel-metrics-listen --otel-metrics-listen-port=2223
+kubectl-gadget deploy --image=ghcr.io/inspektor-gadget/inspektor-gadget:latest --otel-metrics-listen --otel-metrics-listen-address=0.0.0.0:2223
 
 # prometheus
 kubectl apply -f prometheus/prometheus.yaml
