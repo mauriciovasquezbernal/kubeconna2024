@@ -3,7 +3,7 @@
 set -ex
 
 # Set variables
-RESOURCE_GROUP="contribfest-rg-$1"
+RESOURCE_GROUP="contribfest-rg-$RANDOM"
 LOCATION="EastUS"
 VM_NAME="contributest-vm"
 VM_SIZE="Standard_D4ads_v5"
